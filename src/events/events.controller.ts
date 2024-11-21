@@ -2,33 +2,34 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Post()
-  create(@Body() createEventDto: CreateEventDto) {
+  @MessagePattern({cmd:`create-reservas`})
+  create(@Payload() createEventDto: CreateEventDto) {
     return this.eventsService.create(createEventDto);
   }
 
-  @Get()
+  @MessagePattern({cmd:`find-all`})
   findAll() {
     return this.eventsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+  @MessagePattern({cmd:`find-one`})
+  findOne(@Payload('id') id: string) {
+    return this.eventsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(+id, updateEventDto);
+  @MessagePattern({cmd:`update-reserva`})
+  update(@Payload() updateEventDto: UpdateEventDto) {
+    return this.eventsService.update(updateEventDto.id, updateEventDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(+id);
+  @MessagePattern({cmd:`remove-reserva`})
+  remove(@Payload('id') id: string) {
+    return this.eventsService.remove(id);
   }
 }
